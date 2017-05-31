@@ -1,50 +1,83 @@
 // Import libraries for making a component
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
-
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-import { Expand_btn } from './common';
+import { Expand_btn, Button } from './common';
+import data from './List.json';
 
 // Make a component
 class Breakfast extends Component {
-  state = { view_single: true, selected: 'bed_only'};
+	state = { view_single: true, selected: data[0].icon, selected_text: data[0].text};
+		
   expandPress() {
-    //const { email, password } = this.state;
-
     this.setState({ view_single: false });
   }
-  selectBreakfast() {
-    //this.setState({ selected: item });
-    this.setState({ selected: 'breakfast' });
-    this.setState({ view_single: true });
+  selectItem(item, item_text) {
+  	this.setState({ selected: item, selected_text: item_text, view_single: true });
   }
-  selectBed() {
-    this.setState({ selected: 'bed_only' });
-    this.setState({ view_single: true });
+  onButtonPress(item, item_text) {
+    console.log('eureka '+item+' '+item_text);
+    this.setState({ selected: item, selected_text: item_text, view_single: true });
+  }
+  
+  renderAllData(){
+    var selected_flag = <Text></Text>;
+    let items = [];
+    for (let i = 0; i < data.length; i++) {
+      selected_flag = <Text></Text>;
+      if(data[i].icon == this.state.selected){
+          selected_flag = <Icon name="check-circle" size={30} color="#CE712F" />;
+      }
+      //console.log(data[i].icon+''+this.state.selected);
+      items.push(
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity onPress={this.selectItem.bind(this,data[i].icon,data[i].text)} style={{flexDirection: 'row',flex:3}}>
+            <Icon name={data[i].icon} size={30} color="#757777" />
+            <Text style={styles.textStyle} >{data[i].text}</Text>
+          </TouchableOpacity>
+          {selected_flag}
+        </View>
+      );
+    }
+
+
+
+          
+          
+        
+    
+    return (
+      <View style={{flexDirection: 'column'}}>
+        {items.map((allitems, index) => (
+          <View key={index}>
+          {allitems}
+          </View>
+        ))}
+      </View>
+    );
   }
   renderAll(){
-    var bed_only_flag = <Text></Text>;
-    if(this.state.selected === 'bed_only'){
-      bed_only_flag = <Icon name="check-circle" size={30} color="#CE712F" />;
+    var bed_flag = <Text></Text>;
+    if(this.state.selected === 'bed'){
+      bed_flag = <Icon name="check-circle" size={30} color="#CE712F" />;
     }
     var breakfast_flag = <Text></Text>;
-    if(this.state.selected === 'breakfast'){
+    if(this.state.selected === 'coffee'){
       breakfast_flag = <Icon name="check-circle" size={30} color="#CE712F" />;
     }
     return (
       <View style={{padding: 10}}>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity onPress={this.selectBed.bind(this)} style={{flexDirection: 'row',flex:3}}>
+          <TouchableOpacity onPress={this.selectItem.bind(this,'bed')} style={{flexDirection: 'row',flex:3}}>
             <Icon name="bed" size={30} color="#757777" />
             <Text style={styles.textStyle} >Solo la Habitacion</Text>
           </TouchableOpacity>
           <View style={{alignItems: 'flex-end',flex:1}}>
-            {bed_only_flag}
+            {bed_flag}
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity onPress={this.selectBreakfast.bind(this)} style={{flexDirection: 'row', flex:3}}>
+          <TouchableOpacity onPress={this.selectItem.bind(this,'breakfast')} style={{flexDirection: 'row', flex:3}}>
             <Icon name="coffee" size={30} color="#757777" />
             <Text style={styles.textStyle} >Desayuno</Text>
           </TouchableOpacity>
@@ -52,26 +85,19 @@ class Breakfast extends Component {
             {breakfast_flag}
           </View>
         </View>
+
+        
+
       </View>
     );
   }
   renderSelected(){
-    switch (this.state.selected) {
-          case 'breakfast':
-            return (
-              <View style={{flexDirection: 'row'}}>
-                <Icon name="coffee" size={30} color="#757777" />
-                <Text style={styles.textStyle} >Desayuno</Text>
-              </View>
-            );
-          default:
-            return(
-              <View style={{flexDirection: 'row'}}>
-                <Icon name="bed" size={30} color="#757777" />
-                <Text style={styles.textStyle} >Solo la Habitacion</Text>
-              </View>
-            );
-      }
+    return (
+      <View style={{flexDirection: 'row'}}>
+        <Icon name={this.state.selected} size={30} color="#757777" />
+        <Text style={styles.textStyle} >{this.state.selected_text}</Text>
+      </View>
+    );
   }
 
 
@@ -90,8 +116,8 @@ class Breakfast extends Component {
       );
     }else{
       return(
-        <View>
-          {this.renderAll()}
+        <View style={{padding:10}}>
+          {this.renderAllData()}
         </View>
       );
     }
